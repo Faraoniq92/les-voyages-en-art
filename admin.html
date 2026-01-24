@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Le Voyage en Art</title>
+    <style>
+        :root {
+            --primary: #193140;
+            --red: #E8404B;
+            --purple: #302496;
+            --gold: #FCCA46;
+            --neutral-50: #F8F9FA;
+            --neutral-100: #F1F3F5;
+            --neutral-200: #E9ECEF;
+            --neutral-300: #DEE2E6;
+            --neutral-500: #6C757D;
+            --neutral-700: #343A40;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--neutral-100);
+            color: var(--primary);
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+        .header-actions { display: flex; gap: 12px; }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--red); color: white; }
+        .btn-primary:hover { background: #D1323C; }
+        .btn-secondary { background: white; color: var(--primary); }
+        .btn-secondary:hover { background: var(--neutral-100); }
+        .btn-outline { background: transparent; border: 1px solid var(--neutral-300); color: var(--primary); }
+        .btn-outline:hover { border-color: var(--primary); }
+        .btn-small { padding: 6px 12px; font-size: 13px; }
+        .btn-gold { background: var(--gold); color: var(--primary); }
+        .btn-gold:hover { background: #E5B63E; }
+        
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--neutral-200);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--neutral-500);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .tab.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab:hover:not(.active) { color: var(--primary); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+        .card-title { font-size: 16px; font-weight: 600; }
+        .card-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--gold);
+            color: var(--primary);
+        }
+        
+        /* Forms */
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--neutral-500);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--neutral-300);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-hint { font-size: 12px; color: var(--neutral-500); margin-top: 4px; }
+        
+        /* Events Grid */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .event-card.featured { border: 2px solid var(--gold); }
+        .event-image-preview {
+            height: 180px;
+            background: var(--neutral-200);
+            position: relative;
+            overflow: hidden;
+        }
+        .event-image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .event-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .event-image-preview:hover .event-image-overlay { opacity: 1; }
+        .event-card-body { padding: 20px; }
+        .event-card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .event-card-meta { font-size: 14px; color: var(--neutral-500); margin-bottom: 4px; }
+        .event-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--neutral-200);
+        }
+        
+        /* Image Cropper Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--neutral-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--neutral-100);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-body { padding: 24px; overflow-y: auto; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--neutral-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* Image Cropper */
+        .cropper-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+        .cropper-preview {
+            background: var(--neutral-100);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 4/3;
+        }
+        .cropper-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: move;
+        }
+        .cropper-controls { display: flex; flex-direction: column; gap: 20px; }
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--neutral-500);
+            margin-bottom: 8px;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+        .control-value {
+            font-size: 13px;
+            color: var(--neutral-500);
+            text-align: right;
+        }
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+        .position-btn {
+            aspect-ratio: 1;
+            border: 1px solid var(--neutral-300);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--neutral-500);
+            transition: all 0.2s;
+        }
+        .position-btn:hover { border-color: var(--primary); }
+        .position-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        .preview-sizes { margin-top: 20px; }
+        .preview-sizes h4 { font-size: 13px; font-weight: 500; color: var(--neutral-500); margin-bottom: 12px; }
+        .preview-thumbnail {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: var(--neutral-200);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--primary);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #28a745; }
+        
+        /* Hero Section Editor */
+        .hero-preview {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 40px;
+            color: white;
+            margin-bottom: 24px;
+        }
+        .hero-preview-label { color: var(--gold); font-size: 14px; margin-bottom: 8px; }
+        .hero-preview-title { font-size: 32px; font-weight: 700; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.1em; }
+        .hero-preview-title .highlight { color: var(--gold); }
+        
+        /* Section Editor */
+        .section-list { display: flex; flex-direction: column; gap: 16px; }
+        .section-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .section-item:hover { border-color: var(--neutral-300); }
+        .section-item.editing { border-color: var(--purple); }
+        .section-item-header { display: flex; justify-content: space-between; align-items: center; }
+        .section-item-title { font-weight: 600; }
+        .section-item-preview {
+            font-size: 14px;
+            color: var(--neutral-500);
+            margin-top: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--neutral-500);
+        }
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+
+        /* Rich Text Editor */
+        .rich-editor {
+            border: 1px solid var(--neutral-300);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .rich-editor-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: var(--neutral-100);
+            border-bottom: 1px solid var(--neutral-300);
+            flex-wrap: wrap;
+        }
+        .rich-editor-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--neutral-300);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .rich-editor-btn:hover { border-color: var(--primary); background: var(--neutral-50); }
+        .rich-editor-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .rich-editor-btn[data-color="gold"] { background: var(--gold); border-color: var(--gold); }
+        .rich-editor-btn[data-color="white"] { background: white; border-color: var(--neutral-300); }
+        .rich-editor-divider {
+            width: 1px;
+            background: var(--neutral-300);
+            margin: 0 4px;
+        }
+        .rich-editor-content {
+            min-height: 120px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            outline: none;
+            background: white;
+            font-weight: 300;
+        }
+        .rich-editor-content:focus { background: #FFFEF5; }
+        .rich-editor-content .highlight { color: var(--gold); }
+        .rich-editor-content b, .rich-editor-content strong { font-weight: 700; }
+        
+        /* Color picker dropdown */
+        .color-picker {
+            position: relative;
+        }
+        .color-picker-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--neutral-300);
+            border-radius: 6px;
+            padding: 8px;
+            display: none;
+            gap: 4px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .color-picker-dropdown.show { display: flex; }
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: var(--primary); }
+        
+        /* Carousel grid */
+        .carousel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .carousel-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .carousel-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .carousel-card-image {
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            background: var(--neutral-100);
+        }
+        .carousel-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .carousel-card:hover .carousel-card-overlay {
+            opacity: 1;
+        }
+        .carousel-card-body {
+            padding: 12px;
+        }
+        .carousel-card-body .form-group {
+            margin-bottom: 8px;
+        }
+        .carousel-card-body .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .carousel-card-body .form-label {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        .carousel-card-body .form-input {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+        .carousel-card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 12px 12px;
+        }
+        .carousel-card-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>🎨 Le Voyage en Art — Administration</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportData()">📥 Exporter JSON</button>
+            <button class="btn btn-primary" onclick="saveAll()">💾 Sauvegarder</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="events">📅 Événements</button>
+            <button class="tab" data-tab="hero">🎬 Hero</button>
+            <button class="tab" data-tab="sections">📝 Sections</button>
+            <button class="tab" data-tab="settings">⚙️ Paramètres</button>
+        </div>
+
+        <!-- EVENTS TAB -->
+        <div id="events" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Gestion des événements</h2>
+                    <button class="btn btn-primary btn-small" onclick="addEvent()">+ Ajouter</button>
+                </div>
+                <div class="events-grid" id="eventsGrid">
+                    <!-- Events will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- HERO TAB -->
+        <div id="hero" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Section Hero</h2>
+                </div>
+                <div class="hero-preview" id="heroPreview">
+                    <p class="hero-preview-label" id="heroLabelPreview">Prochaine Conférence-Spectacle</p>
+                    <h1 class="hero-preview-title" id="heroTitlePreview">
+                        La <span class="highlight">Peur</span>,<br>
+                        le <span class="highlight">Risque</span><br>
+                        et le <span class="highlight">Courage</span>
+                    </h1>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Label</label>
+                        <input type="text" class="form-input" id="heroLabel" value="Prochaine Conférence-Spectacle" oninput="updateHeroPreview()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sous-titre</label>
+                        <input type="text" class="form-input" id="heroSubtitle" value="Isabelle de La Selle présente">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Titre</label>
+                    <div class="rich-editor">
+                        <div class="rich-editor-toolbar">
+                            <button type="button" class="rich-editor-btn" onclick="execCommand('bold')" title="Gras"><b>B</b></button>
+                            <button type="button" class="rich-editor-btn" onclick="execCommand('italic')" title="Italique"><i>I</i></button>
+                            <div class="rich-editor-divider"></div>
+                            <div class="color-picker">
+                                <button type="button" class="rich-editor-btn" onclick="toggleColorPicker('heroColorPicker')" title="Couleur">🎨</button>
+                                <div class="color-picker-dropdown" id="heroColorPicker">
+                                    <div class="color-swatch" style="background: #FFFFFF; border: 1px solid #ddd;" onclick="applyColor('#FFFFFF')" title="Blanc"></div>
+                                    <div class="color-swatch" style="background: #FCCA46;" onclick="applyColor('#FCCA46')" title="Or"></div>
+                                    <div class="color-swatch" style="background: #E8404B;" onclick="applyColor('#E8404B')" title="Rouge"></div>
+                                    <div class="color-swatch" style="background: #302496;" onclick="applyColor('#302496')" title="Violet"></div>
+                                    <div class="color-swatch" style="background: #193140;" onclick="applyColor('#193140')" title="Teal"></div>
+                                </div>
+                            </div>
+                            <button type="button" class="rich-editor-btn" data-color="gold" onclick="applyColor('#FCCA46')" title="Doré rapide">✨</button>
+                            <button type="button" class="rich-editor-btn" data-color="white" onclick="applyColor('#FFFFFF')" title="Blanc rapide">⬜</button>
+                            <div class="rich-editor-divider"></div>
+                            <button type="button" class="rich-editor-btn" onclick="execCommand('removeFormat')" title="Supprimer formatage">✕</button>
+                        </div>
+                        <div class="rich-editor-content" id="heroTitleEditor" contenteditable="true" oninput="updateHeroPreview()">
+                            La <b style="color: #FCCA46;">PEUR</b>,<br>
+                            le <b style="color: #FCCA46;">RISQUE</b><br>
+                            et le <b style="color: #FCCA46;">COURAGE</b>
+                        </div>
+                    </div>
+                    <p class="form-hint">Sélectionnez du texte puis cliquez sur un bouton pour le formater. ✨ = doré rapide</p>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date et lieu</label>
+                        <input type="text" class="form-input" id="heroDate" value="Le 21 janvier 2026 à 21h — L'Entrepôt, Paris">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Texte du bouton</label>
+                        <input type="text" class="form-input" id="heroCta" value="Réserver ma place">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CARROUSEL HERO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Carrousel d'images</h2>
+                    <button class="btn btn-primary btn-small" onclick="addCarouselSlide()">+ Ajouter une image</button>
+                </div>
+                <p style="color: var(--neutral-500); font-size: 14px; margin-bottom: 16px;">
+                    Les images du carrousel défilent automatiquement. Le cartel (titre + artiste) apparaît au survol.
+                </p>
+                <div class="carousel-grid" id="carouselGrid">
+                    <!-- Slides will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTIONS TAB -->
+        <div id="sections" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Contenus des sections</h2>
+                </div>
+                <div class="section-list" id="sectionsList">
+                    <!-- Sections will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Paramètres généraux</h2>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom du site</label>
+                        <input type="text" class="form-input" id="siteName" value="Le Voyage en Art">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email de contact</label>
+                        <input type="email" class="form-input" id="contactEmail" value="contact@levoyageenart.fr">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (SEO)</label>
+                    <textarea class="form-textarea" id="siteDescription">Des conférences-spectacles qui passent par l'art pour se questionner sur des expériences de vie à la fois intimes et universelles.</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Réseaux sociaux</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="text" class="form-input" id="socialInstagram" placeholder="URL Instagram">
+                        <input type="text" class="form-input" id="socialLinkedin" placeholder="URL LinkedIn">
+                        <input type="text" class="form-input" id="socialYoutube" placeholder="URL YouTube">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Import / Export</h2>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-outline" onclick="exportData()">📥 Exporter les données</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📤 Importer</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="btn btn-outline" style="color: var(--red);" onclick="resetData()">🗑️ Réinitialiser</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE CROPPER MODAL -->
+    <div class="modal" id="cropperModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cadrer l'image</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="cropper-container">
+                    <div class="cropper-preview">
+                        <img id="cropperImage" class="cropper-image" src="" alt="Preview" style="object-position: center center;">
+                    </div>
+                    <div class="cropper-controls">
+                        <div class="control-group">
+                            <label>Position du point focal</label>
+                            <div class="position-grid">
+                                <button class="position-btn" data-pos="left top">↖</button>
+                                <button class="position-btn" data-pos="center top">↑</button>
+                                <button class="position-btn" data-pos="right top">↗</button>
+                                <button class="position-btn" data-pos="left center">←</button>
+                                <button class="position-btn active" data-pos="center center">●</button>
+                                <button class="position-btn" data-pos="right center">→</button>
+                                <button class="position-btn" data-pos="left bottom">↙</button>
+                                <button class="position-btn" data-pos="center bottom">↓</button>
+                                <button class="position-btn" data-pos="right bottom">↘</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>Position horizontale</label>
+                            <input type="range" id="posX" min="0" max="100" value="50" oninput="updateCropperPreview()">
+                            <div class="control-value"><span id="posXVal">50</span>%</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Position verticale</label>
+                            <input type="range" id="posY" min="0" max="100" value="50" oninput="updateCropperPreview()">
+                            <div class="control-value"><span id="posYVal">50</span>%</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Zoom</label>
+                            <input type="range" id="cropZoom" min="100" max="200" value="100" oninput="updateCropperPreview()">
+                            <div class="control-value"><span id="zoomVal">100</span>%</div>
+                        </div>
+                        <div class="preview-sizes">
+                            <h4>Aperçu carte événement</h4>
+                            <div class="preview-thumbnail">
+                                <img id="thumbnailPreview" src="" alt="Thumbnail">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="applyCrop()">Appliquer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EVENT EDIT MODAL -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="eventModalTitle">Modifier l'événement</h3>
+                <button class="modal-close" onclick="closeEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="eventId">
+                <div class="form-group">
+                    <label class="form-label">Thème / Titre</label>
+                    <input type="text" class="form-input" id="eventTitle" placeholder="La Peur, le Risque et le Courage">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="text" class="form-input" id="eventDate" placeholder="21 janvier 2026">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lieu</label>
+                        <input type="text" class="form-input" id="eventLocation" placeholder="L'Entrepôt, Paris">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Badge</label>
+                        <input type="text" class="form-input" id="eventBadge" placeholder="Prochainement">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" id="eventFeatured">
+                            <option value="false">Standard</option>
+                            <option value="true">Mis en avant</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Image</label>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" class="form-input" id="eventImage" placeholder="images/event-peur.jpg" style="flex:1">
+                        <button class="btn btn-outline" onclick="openImageCropperForEvent()">🖼️ Cadrer</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position de l'image</label>
+                    <input type="text" class="form-input" id="eventImagePosition" value="center center" placeholder="center center">
+                    <p class="form-hint">Ex: center center, left top, 30% 70%</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Texte du bouton</label>
+                    <input type="text" class="form-input" id="eventCta" placeholder="Réserver">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lien du bouton</label>
+                    <input type="text" class="form-input" id="eventLink" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeEventModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveEvent()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Sauvegardé !</div>
+
+    <script>
+        // ========== DATA ==========
+        let siteData = {
+            hero: {
+                label: 'Prochaine Conférence-Spectacle',
+                subtitle: 'Isabelle de La Selle présente',
+                title: 'La PEUR, le RISQUE et le COURAGE',
+                titleHtml: 'La <b style="color: #FCCA46;">PEUR</b>,<br>le <b style="color: #FCCA46;">RISQUE</b><br>et le <b style="color: #FCCA46;">COURAGE</b>',
+                date: 'Le 21 janvier 2026 à 21h — L\'Entrepôt, Paris',
+                cta: 'Réserver ma place',
+                carousel: [
+                    {
+                        id: 1,
+                        image: 'images/hero/carrousel/slide-1.jpg',
+                        title: 'Le Voyageur contemplant une mer de nuages',
+                        artist: 'Caspar David Friedrich, 1818'
+                    },
+                    {
+                        id: 2,
+                        image: 'images/hero/carrousel/slide-2.jpg',
+                        title: 'Red Canna',
+                        artist: 'Georgia O\'Keeffe, 1924'
+                    },
+                    {
+                        id: 3,
+                        image: 'images/hero/carrousel/slide-3.jpg',
+                        title: 'Mains',
+                        artist: 'Alfred Stieglitz, 1919'
+                    },
+                    {
+                        id: 4,
+                        image: 'images/hero/carrousel/slide-4.jpg',
+                        title: 'La Nuit étoilée',
+                        artist: 'Vincent van Gogh, 1889'
+                    }
+                ]
+            },
+            events: [
+                {
+                    id: 1,
+                    title: 'La Peur, le Risque et le Courage',
+                    date: '21 janvier 2026',
+                    location: 'L\'Entrepôt, Paris',
+                    badge: 'Complet',
+                    featured: true,
+                    image: 'images/event-peur.jpg',
+                    imagePosition: 'center center',
+                    cta: 'Réserver',
+                    link: '#'
+                },
+                {
+                    id: 2,
+                    title: 'La Fragilité',
+                    date: '18 mars 2026',
+                    location: 'Centre Pompidou, Paris',
+                    badge: 'Mars 2026',
+                    featured: false,
+                    image: 'images/event-fragilite.jpg',
+                    imagePosition: 'center center',
+                    cta: 'En savoir plus',
+                    link: '#'
+                },
+                {
+                    id: 3,
+                    title: 'Le Silence',
+                    date: '15 mai 2026',
+                    location: 'Musée d\'Orsay, Paris',
+                    badge: 'Mai 2026',
+                    featured: false,
+                    image: 'images/event-silence.jpg',
+                    imagePosition: 'center center',
+                    cta: 'En savoir plus',
+                    link: '#'
+                }
+            ],
+            sections: {
+                concept: {
+                    label: 'Le Concept',
+                    title: 'Un voyage à travers l\'art et l\'expérience humaine',
+                    text1: 'Le Voyage en Art propose des cycles de **conférences-spectacles** où Isabelle embarque le spectateur dans un voyage à travers les œuvres pour se questionner sur un aspect à la fois **intime et universel** de l\'expérience humaine.',
+                    text2: 'Une expérience d\'1h30, comme un voyage immersif dans les œuvres et dans notre monde intérieur. L\'exploration visuelle dynamique des œuvres d\'art sur grand écran est rythmée par un texte littéraire qui puise dans l\'histoire de l\'art, la philosophie et la psychologie.'
+                },
+                about: {
+                    label: 'Votre guide',
+                    name: 'Isabelle de La Selle',
+                    bio: 'À l\'issue d\'un travail de recherche exigeant, Isabelle conçoit, écrit puis présente sur scène une conférence-spectacle au cours de laquelle l\'exploration visuelle dynamique des œuvres d\'art est rythmée par un texte littéraire.',
+                    quote: 'L\'art est une clé pour comprendre l\'humain, ses émotions, ses expériences.',
+                    image: 'images/isabelle-portrait.jpg'
+                },
+                testimonial: {
+                    label: 'Ils ont voyagé',
+                    title: 'Témoignages',
+                    quote: 'Une expérience bouleversante. J\'ai redécouvert des œuvres que je pensais connaître, mais cette fois, elles m\'ont parlé intimement. Isabelle a ce don rare de faire dialoguer l\'art avec nos propres questionnements.',
+                    author: 'Marie Laurent',
+                    context: 'Spectatrice — La Fragilité'
+                },
+                newsletter: {
+                    title: 'Prolonger l\'expérience',
+                    description: 'Recevez des réflexions sur l\'art et les dates des prochaines conférences.'
+                }
+            },
+            settings: {
+                siteName: 'Le Voyage en Art',
+                contactEmail: 'contact@levoyageenart.fr',
+                description: 'Des conférences-spectacles qui passent par l\'art pour se questionner sur des expériences de vie à la fois intimes et universelles.',
+                socialInstagram: '',
+                socialLinkedin: '',
+                socialYoutube: ''
+            }
+        };
+
+        // ========== INIT ==========
+        function init() {
+            loadData();
+            renderEvents();
+            renderSections();
+            populateHeroForm();
+            populateSettingsForm();
+            setupTabs();
+            setupPositionButtons();
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('levoyageenart_data');
+            if (saved) {
+                siteData = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('levoyageenart_data', JSON.stringify(siteData));
+        }
+
+        // ========== TABS ==========
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        // ========== EVENTS ==========
+        function renderEvents() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = siteData.events.map(event => `
+                <div class="event-card ${event.featured ? 'featured' : ''}">
+                    <div class="event-image-preview">
+                        <img src="${event.image}" alt="${event.title}" style="object-position: ${event.imagePosition || 'center center'}">
+                        <div class="event-image-overlay">
+                            <button class="btn btn-secondary btn-small" onclick="openImageCropper('event', ${event.id})">🖼️ Cadrer</button>
+                        </div>
+                    </div>
+                    <div class="event-card-body">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <h3 class="event-card-title">${event.title}</h3>
+                            ${event.featured ? '<span class="card-badge">Mis en avant</span>' : ''}
+                        </div>
+                        <p class="event-card-meta">📅 ${event.date}</p>
+                        <p class="event-card-meta">📍 ${event.location}</p>
+                        <div class="event-card-actions">
+                            <button class="btn btn-outline btn-small" style="flex:1" onclick="editEvent(${event.id})">✏️ Modifier</button>
+                            <button class="btn btn-outline btn-small" style="color:var(--red)" onclick="deleteEvent(${event.id})">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addEvent() {
+            const newId = Math.max(...siteData.events.map(e => e.id), 0) + 1;
+            document.getElementById('eventId').value = '';
+            document.getElementById('eventModalTitle').textContent = 'Nouvel événement';
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('eventBadge').value = '';
+            document.getElementById('eventFeatured').value = 'false';
+            document.getElementById('eventImage').value = 'images/';
+            document.getElementById('eventImagePosition').value = 'center center';
+            document.getElementById('eventCta').value = 'En savoir plus';
+            document.getElementById('eventLink').value = '#';
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function editEvent(id) {
+            const event = siteData.events.find(e => e.id === id);
+            if (!event) return;
+            
+            document.getElementById('eventId').value = id;
+            document.getElementById('eventModalTitle').textContent = 'Modifier l\'événement';
+            document.getElementById('eventTitle').value = event.title;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventLocation').value = event.location;
+            document.getElementById('eventBadge').value = event.badge;
+            document.getElementById('eventFeatured').value = event.featured.toString();
+            document.getElementById('eventImage').value = event.image;
+            document.getElementById('eventImagePosition').value = event.imagePosition || 'center center';
+            document.getElementById('eventCta').value = event.cta;
+            document.getElementById('eventLink').value = event.link || '#';
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function saveEvent() {
+            const id = document.getElementById('eventId').value;
+            const eventData = {
+                title: document.getElementById('eventTitle').value,
+                date: document.getElementById('eventDate').value,
+                location: document.getElementById('eventLocation').value,
+                badge: document.getElementById('eventBadge').value,
+                featured: document.getElementById('eventFeatured').value === 'true',
+                image: document.getElementById('eventImage').value,
+                imagePosition: document.getElementById('eventImagePosition').value,
+                cta: document.getElementById('eventCta').value,
+                link: document.getElementById('eventLink').value
+            };
+
+            if (id) {
+                const index = siteData.events.findIndex(e => e.id === parseInt(id));
+                siteData.events[index] = { ...siteData.events[index], ...eventData };
+            } else {
+                const newId = Math.max(...siteData.events.map(e => e.id), 0) + 1;
+                siteData.events.push({ id: newId, ...eventData });
+            }
+
+            saveData();
+            renderEvents();
+            closeEventModal();
+            showToast('Événement enregistré !');
+        }
+
+        function deleteEvent(id) {
+            if (confirm('Supprimer cet événement ?')) {
+                siteData.events = siteData.events.filter(e => e.id !== id);
+                saveData();
+                renderEvents();
+                showToast('Événement supprimé');
+            }
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        // ========== RICH TEXT EDITOR ==========
+        function execCommand(command, value = null) {
+            document.execCommand(command, false, value);
+            document.getElementById('heroTitleEditor').focus();
+        }
+
+        function toggleColorPicker(id) {
+            const picker = document.getElementById(id);
+            picker.classList.toggle('show');
+            
+            // Close on click outside
+            const closeHandler = (e) => {
+                if (!picker.contains(e.target) && !e.target.closest('.color-picker')) {
+                    picker.classList.remove('show');
+                    document.removeEventListener('click', closeHandler);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeHandler), 10);
+        }
+
+        function applyColor(color) {
+            document.execCommand('foreColor', false, color);
+            document.querySelectorAll('.color-picker-dropdown').forEach(p => p.classList.remove('show'));
+            document.getElementById('heroTitleEditor').focus();
+            updateHeroPreview();
+        }
+
+        // ========== HERO ==========
+        function populateHeroForm() {
+            document.getElementById('heroLabel').value = siteData.hero.label;
+            document.getElementById('heroSubtitle').value = siteData.hero.subtitle;
+            
+            // Load rich text content
+            const editor = document.getElementById('heroTitleEditor');
+            if (siteData.hero.titleHtml) {
+                editor.innerHTML = siteData.hero.titleHtml;
+            } else if (siteData.hero.title) {
+                // Convert old markdown format to HTML
+                const html = siteData.hero.title
+                    .replace(/\*\*([^*]+)\*\*/g, '<span style="color: #FCCA46;">$1</span>')
+                    .replace(/\n/g, '<br>');
+                editor.innerHTML = html;
+            }
+            
+            document.getElementById('heroDate').value = siteData.hero.date;
+            document.getElementById('heroCta').value = siteData.hero.cta;
+            
+            // Initialize carousel if not exists
+            if (!siteData.hero.carousel) {
+                siteData.hero.carousel = [];
+            }
+            
+            renderCarousel();
+            updateHeroPreview();
+        }
+
+        function updateHeroPreview() {
+            const label = document.getElementById('heroLabel').value;
+            const titleHtml = document.getElementById('heroTitleEditor').innerHTML;
+            
+            document.getElementById('heroLabelPreview').textContent = label;
+            document.getElementById('heroTitlePreview').innerHTML = titleHtml;
+        }
+        
+        // ========== CAROUSEL ==========
+        function renderCarousel() {
+            const grid = document.getElementById('carouselGrid');
+            if (!siteData.hero.carousel || siteData.hero.carousel.length === 0) {
+                grid.innerHTML = '<p style="color: var(--neutral-500); padding: 20px; text-align: center;">Aucune image. Cliquez sur "+ Ajouter une image" pour commencer.</p>';
+                return;
+            }
+            
+            grid.innerHTML = siteData.hero.carousel.map((slide, index) => `
+                <div class="carousel-card">
+                    <div class="carousel-card-image">
+                        <span class="carousel-card-number">${index + 1}</span>
+                        <img src="${slide.image}" alt="${slide.title}" style="object-position: ${slide.imagePosition || 'center center'}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23eee%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage%3C/text%3E%3C/svg%3E'">
+                        <div class="carousel-card-overlay">
+                            <button class="btn btn-secondary btn-small" onclick="openImageCropper('carousel', ${slide.id})">🖼️ Cadrer</button>
+                        </div>
+                    </div>
+                    <div class="carousel-card-body">
+                        <div class="form-group">
+                            <label class="form-label">Chemin de l'image</label>
+                            <input type="text" class="form-input" value="${slide.image}" onchange="updateCarouselSlide(${slide.id}, 'image', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Titre de l'œuvre (cartel)</label>
+                            <input type="text" class="form-input" value="${slide.title}" onchange="updateCarouselSlide(${slide.id}, 'title', this.value)" placeholder="Ex: Le Voyageur contemplant une mer de nuages">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Artiste + date (cartel)</label>
+                            <input type="text" class="form-input" value="${slide.artist}" onchange="updateCarouselSlide(${slide.id}, 'artist', this.value)" placeholder="Ex: Caspar David Friedrich, 1818">
+                        </div>
+                    </div>
+                    <div class="carousel-card-actions">
+                        ${index > 0 ? `<button class="btn btn-outline btn-small" onclick="moveCarouselSlide(${slide.id}, -1)">⬆️</button>` : '<button class="btn btn-outline btn-small" disabled style="opacity:0.3">⬆️</button>'}
+                        ${index < siteData.hero.carousel.length - 1 ? `<button class="btn btn-outline btn-small" onclick="moveCarouselSlide(${slide.id}, 1)">⬇️</button>` : '<button class="btn btn-outline btn-small" disabled style="opacity:0.3">⬇️</button>'}
+                        <button class="btn btn-outline btn-small" style="color: var(--red); margin-left: auto;" onclick="deleteCarouselSlide(${slide.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function addCarouselSlide() {
+            const newId = siteData.hero.carousel.length > 0 
+                ? Math.max(...siteData.hero.carousel.map(s => s.id)) + 1 
+                : 1;
+            
+            siteData.hero.carousel.push({
+                id: newId,
+                image: 'images/hero/carrousel/slide-' + newId + '.jpg',
+                title: '',
+                artist: '',
+                imagePosition: 'center center'
+            });
+            
+            saveData();
+            renderCarousel();
+            showToast('Image ajoutée au carrousel');
+        }
+        
+        function updateCarouselSlide(id, field, value) {
+            const slide = siteData.hero.carousel.find(s => s.id === id);
+            if (slide) {
+                slide[field] = value;
+                saveData();
+                if (field === 'image') {
+                    renderCarousel();
+                }
+            }
+        }
+        
+        function moveCarouselSlide(id, direction) {
+            const index = siteData.hero.carousel.findIndex(s => s.id === id);
+            if (index === -1) return;
+            
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= siteData.hero.carousel.length) return;
+            
+            // Swap
+            const temp = siteData.hero.carousel[index];
+            siteData.hero.carousel[index] = siteData.hero.carousel[newIndex];
+            siteData.hero.carousel[newIndex] = temp;
+            
+            saveData();
+            renderCarousel();
+        }
+        
+        function deleteCarouselSlide(id) {
+            if (confirm('Supprimer cette image du carrousel ?')) {
+                siteData.hero.carousel = siteData.hero.carousel.filter(s => s.id !== id);
+                saveData();
+                renderCarousel();
+                showToast('Image supprimée');
+            }
+        }
+        
+        function previewCarouselSlide(id) {
+            const slide = siteData.hero.carousel.find(s => s.id === id);
+            if (slide) {
+                window.open(slide.image, '_blank');
+            }
+        }
+
+        // ========== SECTIONS ==========
+        function renderSections() {
+            const list = document.getElementById('sectionsList');
+            const sections = [
+                { key: 'concept', name: 'Le Concept', preview: siteData.sections.concept.title },
+                { key: 'about', name: 'À propos d\'Isabelle', preview: siteData.sections.about.bio },
+                { key: 'testimonial', name: 'Témoignage', preview: siteData.sections.testimonial.quote },
+                { key: 'newsletter', name: 'Newsletter', preview: siteData.sections.newsletter.description }
+            ];
+
+            list.innerHTML = sections.map(s => `
+                <div class="section-item" onclick="editSection('${s.key}')">
+                    <div class="section-item-header">
+                        <span class="section-item-title">${s.name}</span>
+                        <span style="color: var(--neutral-500)">✏️</span>
+                    </div>
+                    <p class="section-item-preview">${s.preview}</p>
+                </div>
+            `).join('');
+        }
+
+        function editSection(key) {
+            // For simplicity, we'll use prompts - could be expanded to modal
+            const section = siteData.sections[key];
+            
+            if (key === 'concept') {
+                section.title = prompt('Titre:', section.title) || section.title;
+                section.text1 = prompt('Paragraphe 1:', section.text1) || section.text1;
+                section.text2 = prompt('Paragraphe 2:', section.text2) || section.text2;
+            } else if (key === 'about') {
+                section.name = prompt('Nom:', section.name) || section.name;
+                section.bio = prompt('Bio:', section.bio) || section.bio;
+                section.quote = prompt('Citation:', section.quote) || section.quote;
+            } else if (key === 'testimonial') {
+                section.quote = prompt('Citation:', section.quote) || section.quote;
+                section.author = prompt('Auteur:', section.author) || section.author;
+                section.context = prompt('Contexte:', section.context) || section.context;
+            } else if (key === 'newsletter') {
+                section.title = prompt('Titre:', section.title) || section.title;
+                section.description = prompt('Description:', section.description) || section.description;
+            }
+
+            saveData();
+            renderSections();
+            showToast('Section mise à jour');
+        }
+
+        // ========== SETTINGS ==========
+        function populateSettingsForm() {
+            document.getElementById('siteName').value = siteData.settings.siteName;
+            document.getElementById('contactEmail').value = siteData.settings.contactEmail;
+            document.getElementById('siteDescription').value = siteData.settings.description;
+            document.getElementById('socialInstagram').value = siteData.settings.socialInstagram || '';
+            document.getElementById('socialLinkedin').value = siteData.settings.socialLinkedin || '';
+            document.getElementById('socialYoutube').value = siteData.settings.socialYoutube || '';
+        }
+
+        // ========== IMAGE CROPPER ==========
+        let currentCropTarget = null;
+        let currentEventId = null;
+
+        function setupPositionButtons() {
+            document.querySelectorAll('.position-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const pos = btn.dataset.pos.split(' ');
+                    const xMap = { left: 0, center: 50, right: 100 };
+                    const yMap = { top: 0, center: 50, bottom: 100 };
+                    
+                    document.getElementById('posX').value = xMap[pos[0]];
+                    document.getElementById('posY').value = yMap[pos[1]];
+                    updateCropperPreview();
+                });
+            });
+        }
+
+        function openImageCropper(target, itemId = null) {
+            currentCropTarget = target;
+            currentEventId = itemId;
+
+            let imageSrc, currentPosition;
+
+            if (target === 'event' && itemId) {
+                const event = siteData.events.find(e => e.id === itemId);
+                imageSrc = event.image;
+                currentPosition = event.imagePosition || 'center center';
+            } else if (target === 'carousel' && itemId) {
+                const slide = siteData.hero.carousel.find(s => s.id === itemId);
+                imageSrc = slide.image;
+                currentPosition = slide.imagePosition || 'center center';
+            } else {
+                return;
+            }
+
+            document.getElementById('cropperImage').src = imageSrc;
+            document.getElementById('thumbnailPreview').src = imageSrc;
+
+            // Parse current position
+            const parts = currentPosition.split(' ');
+            let x = 50, y = 50;
+            if (parts[0].includes('%')) x = parseInt(parts[0]);
+            else if (parts[0] === 'left') x = 0;
+            else if (parts[0] === 'right') x = 100;
+            
+            if (parts[1] && parts[1].includes('%')) y = parseInt(parts[1]);
+            else if (parts[1] === 'top') y = 0;
+            else if (parts[1] === 'bottom') y = 100;
+
+            document.getElementById('posX').value = x;
+            document.getElementById('posY').value = y;
+            document.getElementById('cropZoom').value = 100;
+
+            updateCropperPreview();
+            document.getElementById('cropperModal').classList.add('active');
+        }
+
+        function openImageCropperForEvent() {
+            const id = document.getElementById('eventId').value;
+            const imageSrc = document.getElementById('eventImage').value;
+            const position = document.getElementById('eventImagePosition').value;
+
+            currentCropTarget = 'eventForm';
+            currentEventId = id ? parseInt(id) : null;
+
+            document.getElementById('cropperImage').src = imageSrc;
+            document.getElementById('thumbnailPreview').src = imageSrc;
+
+            const parts = position.split(' ');
+            let x = 50, y = 50;
+            if (parts[0].includes('%')) x = parseInt(parts[0]);
+            else if (parts[0] === 'left') x = 0;
+            else if (parts[0] === 'right') x = 100;
+            else if (parts[0] === 'center') x = 50;
+            
+            if (parts[1]) {
+                if (parts[1].includes('%')) y = parseInt(parts[1]);
+                else if (parts[1] === 'top') y = 0;
+                else if (parts[1] === 'bottom') y = 100;
+                else if (parts[1] === 'center') y = 50;
+            }
+
+            document.getElementById('posX').value = x;
+            document.getElementById('posY').value = y;
+            document.getElementById('cropZoom').value = 100;
+
+            updateCropperPreview();
+            document.getElementById('cropperModal').classList.add('active');
+        }
+
+        function updateCropperPreview() {
+            const x = document.getElementById('posX').value;
+            const y = document.getElementById('posY').value;
+            const zoom = document.getElementById('cropZoom').value;
+
+            document.getElementById('posXVal').textContent = x;
+            document.getElementById('posYVal').textContent = y;
+            document.getElementById('zoomVal').textContent = zoom;
+
+            const position = `${x}% ${y}%`;
+            const cropperImg = document.getElementById('cropperImage');
+            const thumbImg = document.getElementById('thumbnailPreview');
+
+            cropperImg.style.objectPosition = position;
+            cropperImg.style.transform = `scale(${zoom / 100})`;
+            
+            thumbImg.style.objectPosition = position;
+            thumbImg.style.transform = `scale(${zoom / 100})`;
+        }
+
+        function applyCrop() {
+            const x = document.getElementById('posX').value;
+            const y = document.getElementById('posY').value;
+            const position = `${x}% ${y}%`;
+
+            if (currentCropTarget === 'event' && currentEventId) {
+                const event = siteData.events.find(e => e.id === currentEventId);
+                if (event) event.imagePosition = position;
+                renderEvents();
+            } else if (currentCropTarget === 'carousel' && currentEventId) {
+                const slide = siteData.hero.carousel.find(s => s.id === currentEventId);
+                if (slide) slide.imagePosition = position;
+                renderCarousel();
+            } else if (currentCropTarget === 'eventForm') {
+                document.getElementById('eventImagePosition').value = position;
+            }
+
+            saveData();
+            closeModal();
+            showToast('Position de l\'image enregistrée');
+        }
+
+        function closeModal() {
+            document.getElementById('cropperModal').classList.remove('active');
+        }
+
+        // ========== SAVE ALL ==========
+        function saveAll() {
+            // Collect hero data (preserve carousel)
+            const titleHtml = document.getElementById('heroTitleEditor').innerHTML;
+            const existingCarousel = siteData.hero.carousel || [];
+            
+            siteData.hero = {
+                label: document.getElementById('heroLabel').value,
+                subtitle: document.getElementById('heroSubtitle').value,
+                title: titleHtml.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''), // Plain text version
+                titleHtml: titleHtml, // Rich HTML version
+                date: document.getElementById('heroDate').value,
+                cta: document.getElementById('heroCta').value,
+                carousel: existingCarousel
+            };
+
+            // Collect settings
+            siteData.settings = {
+                siteName: document.getElementById('siteName').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                description: document.getElementById('siteDescription').value,
+                socialInstagram: document.getElementById('socialInstagram').value,
+                socialLinkedin: document.getElementById('socialLinkedin').value,
+                socialYoutube: document.getElementById('socialYoutube').value
+            };
+
+            saveData();
+            showToast('Tout est sauvegardé !');
+        }
+
+        // ========== IMPORT / EXPORT ==========
+        function exportData() {
+            const dataStr = JSON.stringify(siteData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'levoyageenart-content.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Export téléchargé !');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    siteData = JSON.parse(e.target.result);
+                    saveData();
+                    init();
+                    showToast('Import réussi !');
+                } catch (err) {
+                    alert('Erreur lors de l\'import');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetData() {
+            if (confirm('Supprimer toutes les données et revenir aux valeurs par défaut ?')) {
+                localStorage.removeItem('levoyageenart_data');
+                location.reload();
+            }
+        }
+
+        // ========== TOAST ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show', 'success');
+            setTimeout(() => toast.classList.remove('show', 'success'), 3000);
+        }
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
