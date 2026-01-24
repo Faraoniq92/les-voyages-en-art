@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Voyage en Art — Conférences-Spectacles</title>
+    <title>Les Voyages En Art | Isabelle de La Selle</title>
     <meta name="description" content="Des conférences-spectacles qui passent par l'art pour se questionner sur des expériences de vie à la fois intimes et universelles.">
+    <link rel="icon" type="image/svg+xml" href="images/favicon-logo.svg">
     
     <style>
         /* ============================================
@@ -331,11 +332,12 @@
             backdrop-filter: blur(10px);
         }
         .nav__logo {
-            font-size: var(--fs-14);
-            font-weight: var(--fw-medium);
-            letter-spacing: var(--ls-wider);
-            text-transform: uppercase;
-            color: var(--neutral-0);
+            display: flex;
+            align-items: center;
+        }
+        .nav__logo img {
+            height: 32px;
+            width: auto;
         }
         .nav__links {
             display: flex;
@@ -1842,11 +1844,11 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .footer__logo {
-            font-size: var(--fs-18);
-            font-weight: var(--fw-medium);
-            letter-spacing: var(--ls-wider);
-            text-transform: uppercase;
-            color: var(--neutral-0);
+            display: inline-block;
+        }
+        .footer__logo img {
+            height: 40px;
+            width: auto;
         }
         .footer__desc {
             font-size: var(--fs-14);
@@ -1948,7 +1950,9 @@
 
     <!-- Navigation -->
     <nav class="nav" id="nav">
-        <a href="#" class="nav__logo">Le Voyage en Art</a>
+        <a href="#" class="nav__logo">
+            <img src="images/logo-LVEA.svg" alt="Les Voyages en Art" height="32">
+        </a>
         <ul class="nav__links">
             <li><a href="#concept" class="nav__link">Le Concept</a></li>
             <li><a href="#events" class="nav__link">Prochains Voyages</a></li>
@@ -2396,7 +2400,9 @@
         <div class="container">
             <div class="footer__top">
                 <div>
-                    <span class="footer__logo">Le Voyage en Art</span>
+                    <a href="#" class="footer__logo">
+                        <img src="images/logo-LVEA.svg" alt="Les Voyages en Art" height="40">
+                    </a>
                     <p class="footer__desc">Des conférences-spectacles qui passent par l'art pour se questionner sur des expériences de vie intimes et universelles.</p>
                     <div class="footer__social">
                         <a href="#" class="footer__social-link" aria-label="Instagram">
@@ -2435,7 +2441,7 @@
                 </div>
             </div>
             <div class="footer__bottom">
-                <p class="footer__copyright">© 2026 Le Voyage en Art. Tous droits réservés.</p>
+                <p class="footer__copyright">© 2026 Les Voyages en Art. Tous droits réservés.</p>
                 <div class="footer__legal">
                     <a href="#">Mentions légales</a>
                     <a href="#">Politique de confidentialité</a>
