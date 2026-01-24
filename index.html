@@ -2555,11 +2555,17 @@
                     
                     // Mettre à jour le bouton nav
                     const navCta = document.querySelector('.nav__cta');
-                    if (navCta) navCta.href = reservationLink;
+                    if (navCta) {
+                        navCta.href = reservationLink;
+                        navCta.target = '_blank';
+                    }
                     
                     // Mettre à jour le bouton hero
                     const heroCta = document.querySelector('.hero__cta');
-                    if (heroCta) heroCta.href = reservationLink;
+                    if (heroCta) {
+                        heroCta.href = reservationLink;
+                        heroCta.target = '_blank';
+                    }
                 }
             }
             
@@ -2687,11 +2693,15 @@
             }
         }
 
-        // Smooth scroll with easing
+        // Smooth scroll with easing (only for internal anchor links)
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
+                // Ne pas bloquer si le href a été changé vers un lien externe
+                const href = a.getAttribute('href');
+                if (!href.startsWith('#')) return;
+                
                 e.preventDefault();
-                const target = document.querySelector(a.getAttribute('href'));
+                const target = document.querySelector(href);
                 if (target) {
                     const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80;
                     window.scrollTo({
