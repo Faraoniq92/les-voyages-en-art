@@ -2547,6 +2547,20 @@
                         </article>
                     `).join('');
                 }
+                
+                // Synchroniser tous les boutons "Réserver" avec le lien de la featured card
+                const featuredEvent = data.events.find(e => e.featured);
+                if (featuredEvent && featuredEvent.link && featuredEvent.link !== '#') {
+                    const reservationLink = featuredEvent.link;
+                    
+                    // Mettre à jour le bouton nav
+                    const navCta = document.querySelector('.nav__cta');
+                    if (navCta) navCta.href = reservationLink;
+                    
+                    // Mettre à jour le bouton hero
+                    const heroCta = document.querySelector('.hero__cta');
+                    if (heroCta) heroCta.href = reservationLink;
+                }
             }
             
             // Concept
