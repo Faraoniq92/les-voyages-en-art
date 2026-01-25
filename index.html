@@ -2625,9 +2625,7 @@
             // Settings
             if (data.settings) {
                 const s = data.settings;
-                document.querySelectorAll('.nav__logo, .footer__logo').forEach(el => {
-                    el.textContent = s.siteName;
-                });
+                // Le logo est maintenant une image SVG, on ne le remplace plus par du texte
                 const footerDesc = document.querySelector('.footer__desc');
                 if (footerDesc) footerDesc.textContent = s.description;
                 
