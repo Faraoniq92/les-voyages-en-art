@@ -1,28 +1,25 @@
 {
   "_comment": "Chaque logo peut avoir plusieurs formats. Le 'preview' est le fichier affiché.",
   
+ {
   "logos": [
     {
-      "id": "principal",
-      "name": "Logo Principal",
-      "variant": "white",
-      "background": "dark",
-      "preview": "logo-LVEA-full-white.svg",
+      "id": "logo-white",
+      "name": "Logo Principal (Blanc)",
       "files": [
-        { "format": "SVG", "file": "logo-LVEA-full-white.svg", "size": "8 KB" },
+        "logo-LVEA-full-white.svg"
       ]
     },
     {
-      "id": "principal",
+      "id": "logo-color",
       "name": "Logo Couleur",
-      "variant": "Couleur",
-      "background": "White",
-      "preview": "logo-LVEA-full-color.svg",
       "files": [
-        { "format": "SVG", "file": "logo-LVEA-full-color.svg", "size": "8 KB" },
-        { "format": "SVG", "file": "logo-LVEA-full-color.png", "size": "8 KB" },
+        "Logo_LVEA-full-color.png",
+        "Logo_LVEA.svg"
       ]
-    },
+    }
+  ]
+}
     {
       "id": "favicon",
       "name": "Favicon / Icône",
