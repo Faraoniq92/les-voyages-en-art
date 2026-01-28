@@ -1,0 +1,68 @@
+{
+  "templates": [
+    {
+      "id": "site-principal",
+      "name": "Site Principal",
+      "description": "Le site web public Les Voyages En Art avec toutes les sections.",
+      "type": "Web",
+      "url": "../index.html",
+      "preview": null
+    },
+    {
+      "id": "admin-cms",
+      "name": "Admin CMS",
+      "description": "Interface d'administration pour gérer le contenu du site.",
+      "type": "Web",
+      "url": "../admin.html",
+      "preview": null
+    },
+    {
+      "id": "figma-design-system",
+      "name": "Design System Figma",
+      "description": "Composants, tokens et guidelines dans Figma.",
+      "type": "Figma",
+      "url": "https://figma.com",
+      "preview": null
+    },
+    {
+      "id": "brief-conference",
+      "name": "Brief Conférence",
+      "description": "Template pour préparer une nouvelle conférence-spectacle.",
+      "type": "Notion",
+      "url": "https://notion.so",
+      "preview": null
+    },
+    {
+      "id": "social-media-kit",
+      "name": "Kit Réseaux Sociaux",
+      "description": "Templates pour posts Instagram, Facebook, LinkedIn.",
+      "type": "Canva",
+      "url": "https://canva.com",
+      "preview": null
+    },
+    {
+      "id": "email-template",
+      "name": "Template Email",
+      "description": "Template pour newsletters et communications.",
+      "type": "HTML",
+      "url": "#",
+      "preview": null
+    },
+    {
+      "id": "presentation-deck",
+      "name": "Deck de Présentation",
+      "description": "Slides pour présenter Les Voyages En Art à des partenaires.",
+      "type": "Google Slides",
+      "url": "https://docs.google.com/presentation",
+      "preview": null
+    },
+    {
+      "id": "dossier-presse",
+      "name": "Dossier de Presse",
+      "description": "Document complet pour les médias et journalistes.",
+      "type": "PDF",
+      "url": "#",
+      "preview": null
+    }
+  ]
+}

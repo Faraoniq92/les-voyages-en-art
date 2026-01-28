@@ -1,0 +1,147 @@
+{
+  "logos": [
+    {
+      "id": "logo-principal",
+      "name": "Logo Principal",
+      "variant": "white",
+      "format": "SVG",
+      "path": "../images/logo-LVEA.svg"
+    },
+    {
+      "id": "favicon",
+      "name": "Favicon",
+      "variant": "color",
+      "format": "SVG",
+      "path": "../images/favicon-logo.svg"
+    }
+  ],
+  
+  "colors": [
+    {
+      "id": "primary",
+      "name": "Primary (Marine)",
+      "hex": "#193140",
+      "rgb": "25, 49, 64",
+      "usage": "Fond principal, texte sur fond clair"
+    },
+    {
+      "id": "gold",
+      "name": "Or (Accent)",
+      "hex": "#FCCA46",
+      "rgb": "252, 202, 70",
+      "usage": "CTA, accents, highlights"
+    },
+    {
+      "id": "red",
+      "name": "Rouge (Colère)",
+      "hex": "#C75146",
+      "rgb": "199, 81, 70",
+      "usage": "Thème Colère, alertes"
+    },
+    {
+      "id": "blue",
+      "name": "Bleu (Tristesse)",
+      "hex": "#5B8FB9",
+      "rgb": "91, 143, 185",
+      "usage": "Thème Tristesse"
+    },
+    {
+      "id": "neutral-light",
+      "name": "Beige Clair",
+      "hex": "#F8F7F4",
+      "rgb": "248, 247, 244",
+      "usage": "Fond secondaire, sections alternées"
+    },
+    {
+      "id": "neutral-dark",
+      "name": "Gris Foncé",
+      "hex": "#2D2A24",
+      "rgb": "45, 42, 36",
+      "usage": "Texte secondaire"
+    }
+  ],
+  
+  "fonts": [
+    {
+      "id": "fedra-sans",
+      "name": "Fedra Sans Pro",
+      "styles": ["Light", "Normal", "Medium", "Bold"],
+      "usage": "Typographie principale",
+      "downloadUrl": null,
+      "license": "Commercial - Typotheque"
+    }
+  ],
+  
+  "assets": [
+    {
+      "id": "hero-sculpture",
+      "name": "Hero Sculpture",
+      "type": "image",
+      "icon": "🖼️",
+      "path": "../images/hero-sculpture.jpg"
+    },
+    {
+      "id": "portrait-isabelle",
+      "name": "Portrait Isabelle",
+      "type": "image",
+      "icon": "👤",
+      "path": "../images/isabelle-portrait.jpg"
+    },
+    {
+      "id": "colere-painting",
+      "name": "Tableau Colère",
+      "type": "image",
+      "icon": "🎨",
+      "path": "../images/voyages/colere.jpg"
+    },
+    {
+      "id": "tristesse-painting",
+      "name": "Tableau Tristesse",
+      "type": "image",
+      "icon": "🎨",
+      "path": "../images/voyages/tristesse.jpg"
+    },
+    {
+      "id": "event-peur",
+      "name": "Event Peur",
+      "type": "image",
+      "icon": "📅",
+      "path": "../images/event-peur.jpg"
+    },
+    {
+      "id": "event-fragilite",
+      "name": "Event Fragilité",
+      "type": "image",
+      "icon": "📅",
+      "path": "../images/event-fragilite.jpg"
+    },
+    {
+      "id": "event-silence",
+      "name": "Event Silence",
+      "type": "image",
+      "icon": "📅",
+      "path": "../images/event-silence.jpg"
+    }
+  ],
+  
+  "guidelines": {
+    "logoUsage": [
+      "Toujours utiliser le logo sur fond sombre (marine ou noir)",
+      "Zone de protection minimum: hauteur du 'V' autour du logo",
+      "Ne pas déformer, recolorer ou ajouter d'effets",
+      "Taille minimum: 120px de large en digital"
+    ],
+    "colorUsage": [
+      "Marine (#193140) = couleur principale, fonds, texte",
+      "Or (#FCCA46) = accents, CTA, éléments importants",
+      "Ne pas utiliser plus de 3 couleurs simultanément",
+      "Contraste minimum 4.5:1 pour le texte"
+    ],
+    "typographyUsage": [
+      "Fedra Sans Pro pour tout le texte",
+      "Light pour citations et grands titres",
+      "Medium pour navigation et labels",
+      "Bold uniquement pour emphase forte"
+    ]
+  }
+}
