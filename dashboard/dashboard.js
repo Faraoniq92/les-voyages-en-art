@@ -9,6 +9,7 @@
 let tokensData = null;
 let templatesData = null;
 let brandData = null;
+let logosData = null;
 
 // ===== DOM ELEMENTS =====
 const sidebar = document.getElementById('sidebar');
@@ -49,6 +50,10 @@ async function loadAllData() {
         // Load brand kit
         const brandResponse = await fetch('data/brand.json');
         brandData = await brandResponse.json();
+        
+        // Load logos from dedicated folder
+        const logosResponse = await fetch('data/logos/logos.json');
+        logosData = await logosResponse.json();
         
         // Update stats
         updateStats();
@@ -154,9 +159,15 @@ function updateStats() {
     const fontCount = brandData?.fonts?.length || 0;
     document.getElementById('stat-fonts').textContent = fontCount;
     
-    // Count assets
-    const assetCount = brandData?.assets?.length || 0;
-    document.getElementById('stat-assets').textContent = assetCount;
+    // Count assets (count total files across all logos + other assets)
+    let logoFileCount = 0;
+    if (logosData?.logos) {
+        logosData.logos.forEach(logo => {
+            logoFileCount += logo.files?.length || 1;
+        });
+    }
+    const otherAssets = brandData?.assets?.length || 0;
+    document.getElementById('stat-assets').textContent = logoFileCount + otherAssets;
 }
 
 // ===== RENDER FUNCTIONS =====
@@ -331,29 +342,91 @@ function renderTemplates() {
 // ----- Logos -----
 function renderLogos() {
     const container = document.getElementById('logos-grid');
-    if (!container || !brandData?.logos) return;
+    if (!container) return;
+    
+    // Use dedicated logos data
+    const logos = logosData?.logos || [];
+    if (!logos.length) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">Aucun logo configuré.</p>';
+        return;
+    }
     
     let html = '';
-    brandData.logos.forEach(logo => {
-        const darkClass = logo.variant === 'white' ? 'logo-item--dark' : '';
+    logos.forEach(logo => {
+        // Determine background class
+        const needsDarkBg = logo.background === 'dark' || logo.variant === 'white';
+        const darkClass = needsDarkBg ? 'logo-item--dark' : '';
+        
+        // Build preview path
+        const previewPath = `data/logos/${logo.preview}`;
+        
+        // Build download options
+        const hasMultipleFormats = logo.files && logo.files.length > 1;
+        const downloadOptions = (logo.files || []).map(f => `
+            <a href="data/logos/${f.file}" download="${f.file}" class="download-option" onclick="event.stopPropagation();">
+                <span class="download-option__format">${f.format}</span>
+                ${f.size ? `<span class="download-option__size">${f.size}</span>` : ''}
+            </a>
+        `).join('');
+        
         html += `
             <div class="logo-item ${darkClass}">
                 <div class="logo-item__preview">
-                    <img src="${logo.path}" alt="${logo.name}">
+                    <img src="${previewPath}" alt="${logo.name}" onerror="this.parentElement.innerHTML='<span style=\\'color:var(--text-tertiary)\\'>Image non trouvée</span>'">
                 </div>
                 <div class="logo-item__info">
                     <div class="logo-item__name">${logo.name}</div>
-                    <div class="logo-item__format">${logo.format}</div>
+                    <div class="logo-item__format">${logo.variant || ''} • ${logo.files?.length || 0} format${logo.files?.length > 1 ? 's' : ''}</div>
                 </div>
-                <a href="${logo.path}" download class="btn btn--small ${logo.variant === 'white' ? 'btn--secondary' : 'btn--primary'}">
-                    Télécharger
-                </a>
+                <div class="download-dropdown">
+                    <button class="btn btn--small ${needsDarkBg ? 'btn--secondary' : 'btn--primary'} download-btn" onclick="toggleDownloadMenu(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Télécharger
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </button>
+                    <div class="download-menu">
+                        ${downloadOptions}
+                    </div>
+                </div>
             </div>
         `;
     });
     
     container.innerHTML = html;
 }
+
+// Toggle download menu
+function toggleDownloadMenu(btn) {
+    const dropdown = btn.closest('.download-dropdown');
+    const menu = dropdown.querySelector('.download-menu');
+    const isOpen = menu.classList.contains('show');
+    
+    // Close all other menus first
+    document.querySelectorAll('.download-menu.show').forEach(m => m.classList.remove('show'));
+    document.querySelectorAll('.download-dropdown.open').forEach(d => d.classList.remove('open'));
+    
+    // Toggle this one
+    if (!isOpen) {
+        menu.classList.add('show');
+        dropdown.classList.add('open');
+    }
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.download-dropdown')) {
+        document.querySelectorAll('.download-menu.show').forEach(m => m.classList.remove('show'));
+        document.querySelectorAll('.download-dropdown.open').forEach(d => d.classList.remove('open'));
+    }
+});
+
+window.toggleDownloadMenu = toggleDownloadMenu;
 
 // ----- Brand Colors -----
 function renderBrandColors() {

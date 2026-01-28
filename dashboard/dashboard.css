@@ -683,7 +683,7 @@ body {
 /* ===== LOGOS GRID ===== */
 .logos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: var(--space-5);
 }
 
@@ -736,6 +736,77 @@ body {
 
 .logo-item--dark .logo-item__format {
     color: rgba(255,255,255,0.6);
+}
+
+/* Download Dropdown */
+.download-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.download-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.download-btn .dropdown-arrow {
+    margin-left: var(--space-1);
+    transition: transform var(--transition-fast);
+}
+
+.download-dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.download-menu {
+    position: absolute;
+    bottom: calc(100% + var(--space-2));
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all var(--transition-fast);
+    z-index: 50;
+    overflow: hidden;
+}
+
+.download-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.download-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    transition: background var(--transition-fast);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.download-option:last-child {
+    border-bottom: none;
+}
+
+.download-option:hover {
+    background: var(--bg-body);
+}
+
+.download-option__format {
+    font-weight: 500;
+}
+
+.download-option__size {
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
 }
 
 /* ===== BRAND COLORS ===== */
@@ -850,6 +921,31 @@ body {
 .asset-item__name {
     font-size: var(--fs-xs);
     color: var(--text-secondary);
+}
+
+/* ===== HELP BADGE ===== */
+.help-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-body);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+    cursor: help;
+    transition: all var(--transition-fast);
+}
+
+.help-badge:hover {
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+    border-color: var(--brand-primary);
+}
+
+.help-badge svg {
+    opacity: 0.7;
 }
 
 /* ===== TOAST ===== */

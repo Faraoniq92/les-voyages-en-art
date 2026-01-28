@@ -1,0 +1,52 @@
+{
+  "_comment": "Chaque logo peut avoir plusieurs formats. Le 'preview' est le fichier affiché.",
+  
+  "logos": [
+    {
+      "id": "principal",
+      "name": "Logo Principal",
+      "variant": "white",
+      "background": "dark",
+      "preview": "logo-LVEA-full-white.svg",
+      "files": [
+        { "format": "SVG", "file": "logo-LVEA-full-white.svg", "size": "8 KB" },
+      ]
+    },
+    {
+      "id": "principal",
+      "name": "Logo Couleur",
+      "variant": "Couleur",
+      "background": "White",
+      "preview": "logo-LVEA-full-color.svg",
+      "files": [
+        { "format": "SVG", "file": "logo-LVEA-full-color.svg", "size": "8 KB" },
+        { "format": "SVG", "file": "logo-LVEA-full-color.png", "size": "8 KB" },
+      ]
+    },
+    {
+      "id": "favicon",
+      "name": "Favicon / Icône",
+      "variant": "color",
+      "background": "any",
+      "preview": "favicon-logo.svg",
+      "files": [
+        { "format": "SVG", "file": "favicon-logo.svg", "size": "2 KB" },
+        { "format": "PNG 32px", "file": "favicon-32.png", "size": "1 KB" },
+        { "format": "PNG 64px", "file": "favicon-64.png", "size": "2 KB" },
+        { "format": "ICO", "file": "favicon.ico", "size": "4 KB" }
+      ]
+    }
+  ],
+  
+  "_template": {
+    "id": "identifiant-unique",
+    "name": "Nom affiché",
+    "variant": "white | black | color",
+    "background": "dark | light | any",
+    "preview": "fichier-apercu.svg",
+    "files": [
+      { "format": "SVG", "file": "nom.svg", "size": "X KB" },
+      { "format": "PNG", "file": "nom.png", "size": "X KB" }
+    ]
+  }
+}
