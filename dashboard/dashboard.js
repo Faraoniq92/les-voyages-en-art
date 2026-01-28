@@ -163,7 +163,10 @@ function updateStats() {
     let logoFileCount = 0;
     if (logosData?.logos) {
         logosData.logos.forEach(logo => {
-            logoFileCount += logo.files?.length || 1;
+            // New format: files is array of strings
+            if (Array.isArray(logo.files)) {
+                logoFileCount += logo.files.length;
+            }
         });
     }
     const otherAssets = brandData?.assets?.length || 0;
@@ -353,47 +356,72 @@ function renderLogos() {
     
     let html = '';
     logos.forEach(logo => {
-        // Determine background class
-        const needsDarkBg = logo.background === 'dark' || logo.variant === 'white';
+        // Parse variant from id or first filename
+        const variant = parseVariant(logo.id) || parseVariant(logo.files?.[0]) || 'color';
+        
+        // Determine background based on variant
+        const needsDarkBg = variant === 'white';
         const darkClass = needsDarkBg ? 'logo-item--dark' : '';
         
-        // Build preview path
-        const previewPath = `data/logos/${logo.preview}`;
+        // Find preview file (prefer SVG, then first file)
+        const files = logo.files || [];
+        const svgFile = files.find(f => f.toLowerCase().endsWith('.svg'));
+        const previewFile = svgFile || files[0];
+        const previewPath = previewFile ? `data/logos/${previewFile}` : '';
         
-        // Build download options
-        const hasMultipleFormats = logo.files && logo.files.length > 1;
-        const downloadOptions = (logo.files || []).map(f => `
-            <a href="data/logos/${f.file}" download="${f.file}" class="download-option" onclick="event.stopPropagation();">
-                <span class="download-option__format">${f.format}</span>
-                ${f.size ? `<span class="download-option__size">${f.size}</span>` : ''}
-            </a>
-        `).join('');
+        // Build download options from filenames
+        const downloadOptions = files.map(f => {
+            const format = parseFormat(f);
+            return `
+                <a href="data/logos/${f}" download="${f}" class="download-option" onclick="event.stopPropagation();">
+                    <span class="download-option__format">${format}</span>
+                </a>
+            `;
+        }).join('');
+        
+        // Variant label for display
+        const variantLabels = {
+            'white': 'Blanc',
+            'black': 'Noir', 
+            'color': 'Couleur',
+            'mono': 'Mono'
+        };
+        const variantLabel = variantLabels[variant] || variant;
         
         html += `
             <div class="logo-item ${darkClass}">
                 <div class="logo-item__preview">
-                    <img src="${previewPath}" alt="${logo.name}" onerror="this.parentElement.innerHTML='<span style=\\'color:var(--text-tertiary)\\'>Image non trouvée</span>'">
+                    ${previewPath 
+                        ? `<img src="${previewPath}" alt="${logo.name}" onerror="this.parentElement.innerHTML='<span style=\\'color:var(--text-tertiary)\\'>Image non trouvée</span>'">`
+                        : '<span style="color:var(--text-tertiary)">Aucun fichier</span>'
+                    }
                 </div>
                 <div class="logo-item__info">
                     <div class="logo-item__name">${logo.name}</div>
-                    <div class="logo-item__format">${logo.variant || ''} • ${logo.files?.length || 0} format${logo.files?.length > 1 ? 's' : ''}</div>
+                    <div class="logo-item__format">${variantLabel} • ${files.length} format${files.length > 1 ? 's' : ''}</div>
                 </div>
-                <div class="download-dropdown">
-                    <button class="btn btn--small ${needsDarkBg ? 'btn--secondary' : 'btn--primary'} download-btn" onclick="toggleDownloadMenu(this)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Télécharger
-                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6,9 12,15 18,9"/>
-                        </svg>
-                    </button>
-                    <div class="download-menu">
-                        ${downloadOptions}
+                ${files.length > 0 ? `
+                    <div class="download-dropdown">
+                        <button class="btn btn--small ${needsDarkBg ? 'btn--secondary' : 'btn--primary'} download-btn" onclick="toggleDownloadMenu(this)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Télécharger
+                            ${files.length > 1 ? `
+                                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"/>
+                                </svg>
+                            ` : ''}
+                        </button>
+                        ${files.length > 1 ? `
+                            <div class="download-menu">
+                                ${downloadOptions}
+                            </div>
+                        ` : ''}
                     </div>
-                </div>
+                ` : ''}
             </div>
         `;
     });
@@ -401,10 +429,46 @@ function renderLogos() {
     container.innerHTML = html;
 }
 
+// Parse variant from filename: "logo-LVEA-white.svg" → "white"
+function parseVariant(filename) {
+    if (!filename) return null;
+    const lower = filename.toLowerCase();
+    if (lower.includes('-white') || lower.includes('_white')) return 'white';
+    if (lower.includes('-black') || lower.includes('_black')) return 'black';
+    if (lower.includes('-color') || lower.includes('_color')) return 'color';
+    if (lower.includes('-mono') || lower.includes('_mono')) return 'mono';
+    return null;
+}
+
+// Parse format from filename: "logo.svg" → "SVG", "logo@2x.png" → "PNG @2x"
+function parseFormat(filename) {
+    if (!filename) return 'Fichier';
+    const ext = filename.split('.').pop().toUpperCase();
+    
+    // Check for size indicators
+    if (filename.includes('@2x')) return `${ext} @2x`;
+    if (filename.includes('@3x')) return `${ext} @3x`;
+    if (filename.includes('-32') || filename.includes('_32')) return `${ext} 32px`;
+    if (filename.includes('-64') || filename.includes('_64')) return `${ext} 64px`;
+    if (filename.includes('-128') || filename.includes('_128')) return `${ext} 128px`;
+    if (filename.includes('-180') || filename.includes('_180')) return `${ext} 180px`;
+    if (filename.includes('-512') || filename.includes('_512')) return `${ext} 512px`;
+    
+    return ext;
+}
+
 // Toggle download menu
 function toggleDownloadMenu(btn) {
     const dropdown = btn.closest('.download-dropdown');
     const menu = dropdown.querySelector('.download-menu');
+    
+    // If only one file, download directly
+    if (!menu) {
+        const link = dropdown.querySelector('a.download-option') || btn.closest('.logo-item').querySelector('a[download]');
+        if (link) link.click();
+        return;
+    }
+    
     const isOpen = menu.classList.contains('show');
     
     // Close all other menus first
