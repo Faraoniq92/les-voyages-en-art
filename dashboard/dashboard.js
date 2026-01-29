@@ -515,23 +515,37 @@ function saveRoadmapCustom(custom) {
     localStorage.setItem('lvea-roadmap-custom', JSON.stringify(custom));
 }
 
-// Build merged phases: original + custom renames + added tasks
+// Build merged phases: original + custom renames + added tasks + order + deletions
 function getMergedPhases() {
     if (!roadmapData?.phases) return [];
     const custom = getRoadmapCustom();
     const renames = custom.renames || {};
     const added = custom.added || {};
+    const deleted = custom.deleted || {};
+    const orderMap = custom.order || {};
 
     return roadmapData.phases.map(phase => {
-        const tasks = phase.tasks.map(t => ({
-            ...t,
-            label: renames[t.id] || t.label
-        }));
-        // Append custom tasks for this phase
+        // Build a map of all tasks (original + added)
+        const taskMap = {};
+        phase.tasks.forEach(t => {
+            if (!deleted[t.id]) taskMap[t.id] = { ...t, label: renames[t.id] || t.label };
+        });
         const extra = added[phase.id] || [];
         extra.forEach(t => {
-            tasks.push({ id: t.id, label: renames[t.id] || t.label, days: t.days });
+            if (!deleted[t.id]) taskMap[t.id] = { id: t.id, label: renames[t.id] || t.label, days: t.days };
         });
+
+        // Apply custom order if exists
+        let tasks;
+        if (orderMap[phase.id]) {
+            tasks = orderMap[phase.id].filter(id => taskMap[id]).map(id => taskMap[id]);
+            // Add any tasks not in order (shouldn't happen, but safety)
+            Object.keys(taskMap).forEach(id => {
+                if (!orderMap[phase.id].includes(id)) tasks.push(taskMap[id]);
+            });
+        } else {
+            tasks = Object.values(taskMap);
+        }
         return { ...phase, tasks };
     });
 }
@@ -584,17 +598,67 @@ function addTaskToPhase(phaseId) {
     const custom = getRoadmapCustom();
     if (!custom.added) custom.added = {};
     if (!custom.added[phaseId]) custom.added[phaseId] = [];
-    const idx = custom.added[phaseId].length + 1;
     const newTask = { id: `${phaseId}-custom-${Date.now()}`, label: 'Nouvelle tâche', days: 1 };
     custom.added[phaseId].push(newTask);
+    // Also add to order
+    if (!custom.order) custom.order = {};
+    if (!custom.order[phaseId]) {
+        // Init order from current phase
+        const phase = roadmapData.phases.find(p => p.id === phaseId);
+        custom.order[phaseId] = phase ? phase.tasks.map(t => t.id) : [];
+    }
+    custom.order[phaseId].push(newTask.id);
     saveRoadmapCustom(custom);
     renderRoadmap();
 
-    // Auto-focus edit on the new task
     setTimeout(() => {
         const el = document.querySelector(`[data-task="${newTask.id}"] .roadmap-task__label`);
         if (el) startEditTask(newTask.id, { stopPropagation: () => {} });
     }, 50);
+}
+
+function deleteTask(phaseId, taskId, e) {
+    e.stopPropagation();
+    const custom = getRoadmapCustom();
+    // Remove from added tasks if custom
+    if (custom.added?.[phaseId]) {
+        custom.added[phaseId] = custom.added[phaseId].filter(t => t.id !== taskId);
+    }
+    // Track deleted original tasks
+    if (!custom.deleted) custom.deleted = {};
+    custom.deleted[taskId] = true;
+    // Remove from order
+    if (custom.order?.[phaseId]) {
+        custom.order[phaseId] = custom.order[phaseId].filter(id => id !== taskId);
+    }
+    // Clean up rename
+    if (custom.renames?.[taskId]) delete custom.renames[taskId];
+    saveRoadmapCustom(custom);
+    // Clean up checked state
+    const state = getRoadmapState();
+    delete state[taskId];
+    saveRoadmapState(state);
+    renderRoadmap();
+}
+
+function moveTask(phaseId, taskId, direction, e) {
+    e.stopPropagation();
+    const custom = getRoadmapCustom();
+    if (!custom.order) custom.order = {};
+    if (!custom.order[phaseId]) {
+        // Init from merged phase task ids
+        const phases = getMergedPhases();
+        const phase = phases.find(p => p.id === phaseId);
+        custom.order[phaseId] = phase ? phase.tasks.map(t => t.id) : [];
+    }
+    const order = custom.order[phaseId];
+    const idx = order.indexOf(taskId);
+    if (idx === -1) return;
+    const newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= order.length) return;
+    [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
+    saveRoadmapCustom(custom);
+    renderRoadmap();
 }
 
 function updateRoadmapProgress() {
@@ -632,8 +696,10 @@ function renderRoadmap() {
             <span class="roadmap-phase__count">${phase.tasks.filter(t => state[t.id]).length}/${phase.tasks.length}</span>
         </div>`;
         html += `<div class="roadmap-phase__tasks">`;
-        phase.tasks.forEach(task => {
+        phase.tasks.forEach((task, idx) => {
             const checked = state[task.id] ? 'checked' : '';
+            const isFirst = idx === 0;
+            const isLast = idx === phase.tasks.length - 1;
             html += `
                 <div class="roadmap-task ${checked}" data-task="${task.id}">
                     <span class="roadmap-task__check" onclick="toggleRoadmapTask('${task.id}')">
@@ -643,6 +709,17 @@ function renderRoadmap() {
                     </span>
                     <span class="roadmap-task__label" ondblclick="startEditTask('${task.id}', event)">${task.label}</span>
                     <span class="roadmap-task__days">${task.days}j</span>
+                    <span class="roadmap-task__actions">
+                        <button class="roadmap-task__btn ${isFirst ? 'disabled' : ''}" onclick="moveTask('${phase.id}','${task.id}',-1,event)" title="Monter" ${isFirst ? 'disabled' : ''}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18,15 12,9 6,15"/></svg>
+                        </button>
+                        <button class="roadmap-task__btn ${isLast ? 'disabled' : ''}" onclick="moveTask('${phase.id}','${task.id}',1,event)" title="Descendre" ${isLast ? 'disabled' : ''}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                        </button>
+                        <button class="roadmap-task__btn roadmap-task__btn--delete" onclick="deleteTask('${phase.id}','${task.id}',event)" title="Supprimer">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </span>
                 </div>
             `;
         });
@@ -663,6 +740,8 @@ function renderRoadmap() {
 window.toggleRoadmapTask = toggleRoadmapTask;
 window.startEditTask = startEditTask;
 window.addTaskToPhase = addTaskToPhase;
+window.deleteTask = deleteTask;
+window.moveTask = moveTask;
 
 // ===== UTILITIES =====
 function copyToClipboard(text, element) {

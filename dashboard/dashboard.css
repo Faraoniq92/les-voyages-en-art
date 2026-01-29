@@ -1198,3 +1198,41 @@ body {
     color: var(--brand-primary);
     background: var(--bg-body);
 }
+
+.roadmap-task__actions {
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+.roadmap-task:hover .roadmap-task__actions {
+    opacity: 1;
+}
+
+.roadmap-task__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.roadmap-task__btn:hover:not(.disabled) {
+    background: var(--border-light);
+    color: var(--text-primary);
+}
+.roadmap-task__btn.disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+.roadmap-task__btn--delete:hover:not(.disabled) {
+    background: #fde8e8;
+    color: var(--brand-red);
+}
