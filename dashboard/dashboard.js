@@ -10,6 +10,7 @@ let tokensData = null;
 let templatesData = null;
 let brandData = null;
 let logosData = null;
+let roadmapData = null;
 
 // ===== DOM ELEMENTS =====
 const sidebar = document.getElementById('sidebar');
@@ -54,7 +55,11 @@ async function loadAllData() {
         // Load logos from dedicated folder
         const logosResponse = await fetch('data/logos/logos.json');
         logosData = await logosResponse.json();
-        
+
+        // Load roadmap
+        const roadmapResponse = await fetch('data/roadmap.json');
+        roadmapData = await roadmapResponse.json();
+
         // Update stats
         updateStats();
     } catch (error) {
@@ -182,6 +187,7 @@ function renderAll() {
     renderBrandColors();
     renderBrandFonts();
     renderAssets();
+    renderRoadmap();
 }
 
 // ----- Colors -----
@@ -487,6 +493,86 @@ function renderAssets() {
     
     container.innerHTML = html;
 }
+
+// ----- Roadmap -----
+function getRoadmapState() {
+    try {
+        return JSON.parse(localStorage.getItem('lvea-roadmap') || '{}');
+    } catch { return {}; }
+}
+
+function saveRoadmapState(state) {
+    localStorage.setItem('lvea-roadmap', JSON.stringify(state));
+}
+
+function toggleRoadmapTask(taskId) {
+    const state = getRoadmapState();
+    state[taskId] = !state[taskId];
+    saveRoadmapState(state);
+    updateRoadmapProgress();
+    // Update checkbox visually
+    const checkbox = document.querySelector(`[data-task="${taskId}"]`);
+    if (checkbox) {
+        checkbox.classList.toggle('checked', state[taskId]);
+    }
+}
+
+function updateRoadmapProgress() {
+    if (!roadmapData?.phases) return;
+    const state = getRoadmapState();
+    let total = 0, done = 0;
+    roadmapData.phases.forEach(phase => {
+        phase.tasks.forEach(task => {
+            total++;
+            if (state[task.id]) done++;
+        });
+    });
+    const progressEl = document.getElementById('roadmap-progress');
+    const fillEl = document.getElementById('roadmap-progress-fill');
+    if (progressEl) progressEl.textContent = `${done} / ${total} tâches`;
+    if (fillEl) fillEl.style.width = total ? `${(done / total) * 100}%` : '0%';
+}
+
+function renderRoadmap() {
+    const container = document.getElementById('roadmap');
+    if (!container || !roadmapData?.phases) return;
+
+    const state = getRoadmapState();
+    let html = '';
+
+    roadmapData.phases.forEach(phase => {
+        const phaseDone = phase.tasks.every(t => state[t.id]);
+        const phasePartial = phase.tasks.some(t => state[t.id]);
+        const phaseStatusClass = phaseDone ? 'roadmap-phase--done' : phasePartial ? 'roadmap-phase--partial' : '';
+
+        html += `<div class="roadmap-phase ${phaseStatusClass}">`;
+        html += `<div class="roadmap-phase__header">
+            <span class="roadmap-phase__name">${phase.name}</span>
+            <span class="roadmap-phase__count">${phase.tasks.filter(t => state[t.id]).length}/${phase.tasks.length}</span>
+        </div>`;
+        html += `<div class="roadmap-phase__tasks">`;
+        phase.tasks.forEach(task => {
+            const checked = state[task.id] ? 'checked' : '';
+            html += `
+                <label class="roadmap-task ${checked}" data-task="${task.id}" onclick="toggleRoadmapTask('${task.id}')">
+                    <span class="roadmap-task__check">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20,6 9,17 4,12"/>
+                        </svg>
+                    </span>
+                    <span class="roadmap-task__label">${task.label}</span>
+                    <span class="roadmap-task__days">${task.days}j</span>
+                </label>
+            `;
+        });
+        html += `</div></div>`;
+    });
+
+    container.innerHTML = html;
+    updateRoadmapProgress();
+}
+
+window.toggleRoadmapTask = toggleRoadmapTask;
 
 // ===== UTILITIES =====
 function copyToClipboard(text, element) {

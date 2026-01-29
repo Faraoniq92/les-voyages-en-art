@@ -1,0 +1,50 @@
+{
+  "phases": [
+    {
+      "id": "audit",
+      "name": "Audit initial",
+      "tasks": [
+        { "id": "audit-1", "label": "Analyse rapide des supports existants et clarification des objectifs", "days": 3 }
+      ]
+    },
+    {
+      "id": "strategie",
+      "name": "Stratégie de communication",
+      "tasks": [
+        { "id": "strat-1", "label": "Définition du positionnement stratégique et des messages clés", "days": 6 },
+        { "id": "strat-2", "label": "Recommandations sur les canaux de diffusion (réseaux, newsletters, démarche direct)", "days": 3 },
+        { "id": "strat-3", "label": "Plan de diffusion et calendrier éditorial", "days": 2 }
+      ]
+    },
+    {
+      "id": "refonte",
+      "name": "Refonte visuelle",
+      "tasks": [
+        { "id": "refonte-1", "label": "Définition du territoire visuel et de l'univers graphique (moodboard)", "days": 4 },
+        { "id": "refonte-2", "label": "Création du logotype avec 3 propositions", "days": 20 },
+        { "id": "refonte-3", "label": "Création de la palette de couleurs et typographies", "days": 6 },
+        { "id": "refonte-4", "label": "Création du jeux typographiques", "days": 6 },
+        { "id": "refonte-5", "label": "Développement des identités visuelles (mock-ups) validation des directions graphiques", "days": 3 }
+      ]
+    },
+    {
+      "id": "supports",
+      "name": "Conception des supports",
+      "tasks": [
+        { "id": "supports-1", "label": "Création du dossier de presse (rédaction, mise en page, optimisation graphique)", "days": 12 },
+        { "id": "supports-2", "label": "Création des supports pour conférences (slides, animations, vidéos)", "days": 14 },
+        { "id": "supports-3", "label": "Conception de modèles de supports (présentations, affiches, documents de communication)", "days": 10 },
+        { "id": "supports-4", "label": "Adaptation des visuels promotionnels pour différents formats et canaux", "days": 8 }
+      ]
+    },
+    {
+      "id": "finalisation",
+      "name": "Coordination et finalisation",
+      "tasks": [
+        { "id": "final-1", "label": "Réunions de suivi et ajustements stratégiques", "days": 1 },
+        { "id": "final-2", "label": "Préparation et livraison des fichiers finaux", "days": 5 },
+        { "id": "final-3", "label": "Rédaction d'un guide d'utilisation des supports et recommandations finales", "days": 6 }
+      ]
+    }
+  ]
+}

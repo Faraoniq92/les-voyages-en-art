@@ -1045,3 +1045,126 @@ body {
 .sidebar-overlay.show {
     display: block;
 }
+
+/* ===== ROADMAP ===== */
+.card__header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+.card__header-row .card__title {
+    margin-bottom: 0;
+}
+
+.roadmap-progress {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.roadmap-progress-bar {
+    height: 6px;
+    background: var(--border-light);
+    border-radius: 3px;
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+}
+.roadmap-progress-bar__fill {
+    height: 100%;
+    background: var(--brand-primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.roadmap-phase {
+    margin-bottom: var(--space-5);
+}
+.roadmap-phase:last-child {
+    margin-bottom: 0;
+}
+
+.roadmap-phase__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+    margin-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-light);
+}
+.roadmap-phase__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.roadmap-phase__count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+.roadmap-phase--done .roadmap-phase__name {
+    color: var(--text-tertiary);
+}
+
+.roadmap-phase__tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.roadmap-task {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+}
+.roadmap-task:hover {
+    background: var(--bg-body);
+}
+
+.roadmap-task__check {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-light);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+.roadmap-task__check svg {
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.roadmap-task.checked .roadmap-task__check {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+.roadmap-task.checked .roadmap-task__check svg {
+    opacity: 1;
+    stroke: white;
+}
+.roadmap-task.checked .roadmap-task__label {
+    text-decoration: line-through;
+    color: var(--text-tertiary);
+}
+
+.roadmap-task__label {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+.roadmap-task__days {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    min-width: 28px;
+    text-align: right;
+}
