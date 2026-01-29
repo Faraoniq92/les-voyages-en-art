@@ -1202,7 +1202,7 @@ body {
 .roadmap-task__actions {
     display: flex;
     gap: 2px;
-    opacity: 0;
+    opacity: 0.4;
     transition: opacity 0.15s;
     flex-shrink: 0;
 }
