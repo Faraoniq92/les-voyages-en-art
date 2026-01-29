@@ -505,23 +505,103 @@ function saveRoadmapState(state) {
     localStorage.setItem('lvea-roadmap', JSON.stringify(state));
 }
 
+function getRoadmapCustom() {
+    try {
+        return JSON.parse(localStorage.getItem('lvea-roadmap-custom') || '{}');
+    } catch { return {}; }
+}
+
+function saveRoadmapCustom(custom) {
+    localStorage.setItem('lvea-roadmap-custom', JSON.stringify(custom));
+}
+
+// Build merged phases: original + custom renames + added tasks
+function getMergedPhases() {
+    if (!roadmapData?.phases) return [];
+    const custom = getRoadmapCustom();
+    const renames = custom.renames || {};
+    const added = custom.added || {};
+
+    return roadmapData.phases.map(phase => {
+        const tasks = phase.tasks.map(t => ({
+            ...t,
+            label: renames[t.id] || t.label
+        }));
+        // Append custom tasks for this phase
+        const extra = added[phase.id] || [];
+        extra.forEach(t => {
+            tasks.push({ id: t.id, label: renames[t.id] || t.label, days: t.days });
+        });
+        return { ...phase, tasks };
+    });
+}
+
 function toggleRoadmapTask(taskId) {
     const state = getRoadmapState();
     state[taskId] = !state[taskId];
     saveRoadmapState(state);
     updateRoadmapProgress();
-    // Update checkbox visually
     const checkbox = document.querySelector(`[data-task="${taskId}"]`);
     if (checkbox) {
         checkbox.classList.toggle('checked', state[taskId]);
     }
 }
 
+function startEditTask(taskId, e) {
+    e.stopPropagation();
+    const labelEl = document.querySelector(`[data-task="${taskId}"] .roadmap-task__label`);
+    if (!labelEl || labelEl.querySelector('input')) return;
+
+    const current = labelEl.textContent.trim();
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'roadmap-task__edit-input';
+    input.value = current;
+    labelEl.textContent = '';
+    labelEl.appendChild(input);
+    input.focus();
+    input.select();
+
+    const save = () => {
+        const val = input.value.trim();
+        if (val && val !== current) {
+            const custom = getRoadmapCustom();
+            if (!custom.renames) custom.renames = {};
+            custom.renames[taskId] = val;
+            saveRoadmapCustom(custom);
+        }
+        labelEl.textContent = val || current;
+    };
+
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') input.blur();
+        if (ev.key === 'Escape') { input.value = current; input.blur(); }
+    });
+}
+
+function addTaskToPhase(phaseId) {
+    const custom = getRoadmapCustom();
+    if (!custom.added) custom.added = {};
+    if (!custom.added[phaseId]) custom.added[phaseId] = [];
+    const idx = custom.added[phaseId].length + 1;
+    const newTask = { id: `${phaseId}-custom-${Date.now()}`, label: 'Nouvelle tâche', days: 1 };
+    custom.added[phaseId].push(newTask);
+    saveRoadmapCustom(custom);
+    renderRoadmap();
+
+    // Auto-focus edit on the new task
+    setTimeout(() => {
+        const el = document.querySelector(`[data-task="${newTask.id}"] .roadmap-task__label`);
+        if (el) startEditTask(newTask.id, { stopPropagation: () => {} });
+    }, 50);
+}
+
 function updateRoadmapProgress() {
-    if (!roadmapData?.phases) return;
+    const phases = getMergedPhases();
     const state = getRoadmapState();
     let total = 0, done = 0;
-    roadmapData.phases.forEach(phase => {
+    phases.forEach(phase => {
         phase.tasks.forEach(task => {
             total++;
             if (state[task.id]) done++;
@@ -537,10 +617,11 @@ function renderRoadmap() {
     const container = document.getElementById('roadmap');
     if (!container || !roadmapData?.phases) return;
 
+    const phases = getMergedPhases();
     const state = getRoadmapState();
     let html = '';
 
-    roadmapData.phases.forEach(phase => {
+    phases.forEach(phase => {
         const phaseDone = phase.tasks.every(t => state[t.id]);
         const phasePartial = phase.tasks.some(t => state[t.id]);
         const phaseStatusClass = phaseDone ? 'roadmap-phase--done' : phasePartial ? 'roadmap-phase--partial' : '';
@@ -554,18 +635,25 @@ function renderRoadmap() {
         phase.tasks.forEach(task => {
             const checked = state[task.id] ? 'checked' : '';
             html += `
-                <label class="roadmap-task ${checked}" data-task="${task.id}" onclick="toggleRoadmapTask('${task.id}')">
-                    <span class="roadmap-task__check">
+                <div class="roadmap-task ${checked}" data-task="${task.id}">
+                    <span class="roadmap-task__check" onclick="toggleRoadmapTask('${task.id}')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                             <polyline points="20,6 9,17 4,12"/>
                         </svg>
                     </span>
-                    <span class="roadmap-task__label">${task.label}</span>
+                    <span class="roadmap-task__label" ondblclick="startEditTask('${task.id}', event)">${task.label}</span>
                     <span class="roadmap-task__days">${task.days}j</span>
-                </label>
+                </div>
             `;
         });
-        html += `</div></div>`;
+        html += `</div>`;
+        html += `<button class="roadmap-add-task" onclick="addTaskToPhase('${phase.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Ajouter une tâche
+        </button>`;
+        html += `</div>`;
     });
 
     container.innerHTML = html;
@@ -573,6 +661,8 @@ function renderRoadmap() {
 }
 
 window.toggleRoadmapTask = toggleRoadmapTask;
+window.startEditTask = startEditTask;
+window.addTaskToPhase = addTaskToPhase;
 
 // ===== UTILITIES =====
 function copyToClipboard(text, element) {
